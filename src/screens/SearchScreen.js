@@ -1,12 +1,35 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native'
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import SearchBar from '../components/SearchBar';
+import useResults from '../hooks/useResults';
+import ResultsList from '../components/ResultsList';
 
 const SearchScreen = () => {
-  return <View>
-    <Text>Search Screen</Text>
-  </View>
-}
+  const [term, setTerm] = useState('');
+  const [searchApi, results, errorMessage] = useResults();
 
-const styles = StyleSheet.create()
+  const filterResultsByPrice = price => {
+    return results.filter(result => {
+      return result.price === price;
+    });
+  };
 
-export default SearchScreen
+  return (
+    <View>
+      <SearchBar
+        term={term}
+        onTermChange={setTerm}
+        onTermSubmit={() => searchApi(term)}
+      />
+      {errorMessage ? <Text>{errorMessage}</Text> : null}
+      <Text>We have found {results.length} results</Text>
+      <ResultsList results={filterResultsByPrice('£')} title="Budget" />
+      <ResultsList results={filterResultsByPrice('££')} title="Splash" />
+      <ResultsList results={filterResultsByPrice('£££')} title="Treat" />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({});
+
+export default SearchScreen;
